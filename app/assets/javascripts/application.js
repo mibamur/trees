@@ -12,4 +12,8 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require jquery.ui.all
+//= require excanvas.compiled
+//= require jquery.jsPlumb-1.3.16-all-min
+//= require mustache
 //= require_tree .
