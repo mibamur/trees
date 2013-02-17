@@ -7,7 +7,8 @@ module NodesHelper
 			hash[node.id][:links] = []
 			hash[node.id][:name] = node.name
 			hash[node.id][:description] = node.description
-			hash[node.id][:y] = hash[node.id][:x] = 0
+			hash[node.id][:x] = node.x || 0
+			hash[node.id][:y] = node.y || 0
 			node.nodes.each do |link|
 				hash[node.id][:links] << link.id		
 			end

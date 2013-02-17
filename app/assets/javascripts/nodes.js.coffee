@@ -1,6 +1,7 @@
 node = 
 	"""
-		<div id='node{{id}}' class='node'>
+		<div id='node{{id}}' class='node' style='top:{{x}}px; left:{{y}}px'>
+			<a class='close' href='#'>&times;</a>
 			<strong>
 				<p class='title'>{{name}}</p>
 			</strong>
@@ -26,10 +27,17 @@ nodeConnector =
 
 		window.nodes.growing_tree $('section#workspace').data 'tree'
 
+		$('a.close').click ->
+			id = $(this).parent().attr('id').replace(/^\D+/,'')
+			if id and confirm 'are you sure?'
+				$("#node#{id}").remove()
+				$.ajax type: 'DELETE', url: "nodes/#{id}"
+		false
+
 	growing_tree: (seed)-> 
 		$.each seed, (k)-> 
 			unless  $(".node[data-id='#{k}']").length > 0
-				$('section#workspace').append Mustache.render node, id: k, name: seed[k]['name'], description: seed[k]['description']
+				$('section#workspace').append Mustache.render node, id: k, name: seed[k]['name'], description: seed[k]['description'], x: seed[k]['x'], y: seed[k]['y']
 		$.each seed, (k,v)-> 
 			if v['links'].length > 0
 				$.each v['links'], (_, id) -> 
@@ -38,13 +46,11 @@ nodeConnector =
 	      		target: "node#{id}"
 	      		, nodeConnector
 
-			jsPlumb.draggable $('.node')
+			jsPlumb.draggable $('.node'), 
+				stop: (e, ui)-> 
+					id = ui.helper.attr('id').replace(/^\D+/,'')
+					console.log id
+					$.ajax type: 'PUT', url: "/nodes/#{id}", data: { node: { x: ui.position.top, y: ui.position.left }}
 
 $ -> 
 	window.nodes.init()
-	# id = 1
-	# $('a.create').click -> 
-	# 	$('section#workspace').append $("<div class='node' id='node#{id}'>")
-	# 	jsPlumb.draggable $('.node')
-
-	
