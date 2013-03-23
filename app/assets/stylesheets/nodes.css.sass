@@ -19,16 +19,33 @@ section#workspace
 	padding-top: 30px
 
 .node
-	padding: 10px
+	//cursor: all-scroll
+	padding: 10px 10px 10px 10px
 	position: absolute
 	max-width: 200px
 	background-color: grey
 	border: 1px solid silver
-	.title
-		text-align: center
-	a.close
-		float: right
-		margin-top: -5px
-		text-decoration: none
-		color: white
-		font-weight: bold
+	.node-header 
+		.title
+			text-align: center
+			margin-left: 25px
+			width: 65%
+			display: block
+		a.close
+			float: right
+			margin-top: -5px
+			text-decoration: none
+			color: white
+			font-weight: bold
+		.connector
+			cursor: pointer
+			float: left
+			background-color: silver
+			width: 25px
+			height: 25px
+			position: absolute
+			top: 0
+			left: 0
+
+.dragHover
+	border: 1px dashed silver
