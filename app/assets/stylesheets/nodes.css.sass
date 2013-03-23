@@ -1,51 +1,59 @@
 body
-	margin: 0
-	padding: 0
+  margin: 0
+  padding: 0
 
 header.main-menu
-	width: 100%
-	height: 30px
-	position: fixed
-	top: 0
-	background-color: silver
-	ul
-		list-style: none
-		margin-top: 5px
-		li 
-			display: inline-block
-			margin-left: 10px 
+  width: 100%
+  height: 30px
+  position: fixed
+  top: 0
+  background-color: silver
+  ul
+    list-style: none
+    margin-top: 5px
+    li 
+      display: inline-block
+      margin-left: 10px 
 
 section#workspace
-	padding-top: 30px
+  padding-top: 30px
 
 .node
-	//cursor: all-scroll
-	padding: 10px 10px 10px 10px
-	position: absolute
-	max-width: 200px
-	background-color: grey
-	border: 1px solid silver
-	.node-header 
-		.title
-			text-align: center
-			margin-left: 25px
-			width: 65%
-			display: block
-		a.close
-			float: right
-			margin-top: -5px
-			text-decoration: none
-			color: white
-			font-weight: bold
-		.connector
-			cursor: pointer
-			float: left
-			background-color: silver
-			width: 25px
-			height: 25px
-			position: absolute
-			top: 0
-			left: 0
+  //cursor: all-scroll
+  padding: 10px 10px 10px 10px
+  position: absolute
+  max-width: 200px
+  background-color: grey
+  border: 1px solid silver
+  .node-header 
+    .title
+      text-align: center
+      margin-left: 25px
+      width: 65%
+      display: block
+    a.close
+      float: right
+      margin-top: -5px
+      text-decoration: none
+      color: white
+      font-weight: bold
+    .connector
+      cursor: pointer
+      float: left
+      background-color: silver
+      width: 25px
+      height: 25px
+      position: absolute
+      top: 0
+      left: 0
+  .new-desc
+    max-width: 200px
+  .ok-button 
+    text-align: center
+    display: block
+    cursor: pointer
+  p.description
+    cursor: pointer
 
 .dragHover
-	border: 1px dashed silver
+  border: 1px dashed silver
