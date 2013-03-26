@@ -17,7 +17,7 @@ nodeConnector =
   #endpoint: "Blank",
   anchor: "Continuous"
   overlays: [ ["PlainArrow", {location:1, width:20, length:12} ]]
-  connector: ["StateMachine", curviness: 20 ]
+  #connector: ["StateMachine", curviness: 20 ]
 
 @nodes = 
   init: -> 
@@ -119,9 +119,7 @@ nodeConnector =
       jsPlumb.makeSource $(e),
         parent: parent
         anchor: "Continuous"
-        connector: ["StateMachine",
-          curviness: 20
-        ]
+        #connector: ["StateMachine", curviness: 20]
         connectorStyle:
           strokeStyle: "#42a62c"
           lineWidth: 2
@@ -137,8 +135,11 @@ nodeConnector =
         #if confirm "Connect #{params.sourceId} to #{params.targetId}?"
         from = params.sourceId.replace(/^\D+/,'')
         to = params.targetId.replace(/^\D+/,'')
-        # save connection 
-        $.ajax type: 'PUT', url: "/nodes/#{from}", data: { connection: { from: from, to: to }}
+        unless from == to 
+          # save connection 
+          $.ajax type: 'PUT', url: "/nodes/#{from}", data: { connection: { from: from, to: to }}
+        else 
+          false 
 
 $ -> 
   window.nodes.init()
