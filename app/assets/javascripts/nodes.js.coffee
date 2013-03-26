@@ -94,12 +94,28 @@ nodeConnector =
   zoom_workspace: (i)-> 
     window.current_zoom = parseInt($('section#workspace').css 'zoom') unless window.current_zoom
     window.current_zoom += i 
-    $('section#workspace').css zoom: window.current_zoom
+    if window.current_zoom > 0.4
+      $('section#workspace').css(zoom: window.current_zoom) 
+    else 
+      window.current_zoom = 0.4
+    jsPlumb.repaintEverything()
 
   rebind_blocks: (klass) -> 
+    pointY = 0
+    pointX = 0
+
     # make nodes draggable 
     jsPlumb.draggable $(klass), 
+      start: (e, ui)-> 
+        pointY = e.pageY / window.current_zoom - parseInt $(e.target).css('top')
+        pointX = e.pageX / window.current_zoom - parseInt $(e.target).css('left')
+      drag: (e, ui)-> 
+        if window.current_zoom
+          ui.position.top = Math.round(e.pageY / window.current_zoom - pointY) 
+          ui.position.left = Math.round(e.pageX / window.current_zoom - pointX)
+          jsPlumb.repaint $(e.target).attr 'id'
       stop: (e, ui)-> 
+        jsPlumb.repaint $(e.target).attr 'id'
         id = ui.helper.attr('id').replace(/^\D+/,'')
         # save current position
         $.ajax type: 'PUT', url: "/nodes/#{id}", data: { node: { x: ui.position.top, y: ui.position.left }}
