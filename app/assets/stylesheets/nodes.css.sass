@@ -1,59 +1,160 @@
+@import url("http://weloveiconfonts.com/api/?family=typicons")
+
+/* typicons */
+[class*="typicons-"]:before 
+  font-family: 'typicons', sans-serif
+
+html 
+  font: 100%/1.5 Helvetica Neue, Helvetica, Arial, sans-serif
+  -webkit-font-smoothing: antialiased
+
 body
   margin: 0
   padding: 0
+  background: none, linear-gradient(rgba(255, 255, 255, .5) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .5) 1px, transparent 1px), linear-gradient(rgba(255, 255, 255, .3) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .3) 1px, transparent 1px)
+  background-color: #56a3c7
+  background-size: cover, 5rem 5rem, 5rem 5rem, 1rem 1rem, 1rem 1rem
 
 header.main-menu
+  z-index: 2
   width: 100%
   height: 30px
   position: fixed
   top: 0
-  background-color: silver
+  background-color: #3f7eb6
+  background-image: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.15))
   ul
     list-style: none
-    margin-top: 5px
+    margin: 0
+    line-height: 30px
     li 
       display: inline-block
       margin-left: 10px 
+      a
+        font-size: 1em
+        color: #fff
+        text-decoration: none
 
 section#workspace
   padding-top: 30px
 
-.node
-  //cursor: all-scroll
-  padding: 10px 10px 10px 10px
-  position: absolute
-  max-width: 200px
-  background-color: grey
-  border: 1px solid silver
-  .node-header 
+  .horizontal-menu-on
     .title
-      text-align: center
-      margin-left: 25px
-      width: 65%
-      display: block
-    a.close
-      float: right
-      margin-top: -5px
-      text-decoration: none
-      color: white
-      font-weight: bold
-    .connector
-      cursor: pointer
-      float: left
-      background-color: silver
-      width: 25px
-      height: 25px
-      position: absolute
-      top: 0
-      left: 0
-  .new-desc
-    max-width: 200px
-  .ok-button 
+      border-radius: 5px
+.node
+  z-index: 1
+  border-radius: 5px
+  box-shadow: 0 5px 20px rgba(80,0,0,.3)
+  position: absolute
+  width: 200px
+  background-color: #3f7eb6
+  .title 
     text-align: center
+    font-size: 1em
+    background-color: #3f7eb6
+    background-image: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.15))
+    border-radius: 5px 5px 0 0
+    box-shadow: inset 0 1px rgba(255,255,255,.3)
+    padding: .75em
+    color: #fff
+    text-shadow: 0 1px 1px rgba(0,0,0,.2)
+    margin: 0
+    position: relative
+  .close 
+    float: right
+    text-decoration: none
+    color: inherit
+  .description
+    font: inherit
+    font-size: .75em
+    color: rgba(0,0,0,.7)
+    margin: 0
     display: block
-    cursor: pointer
-  p.description
-    cursor: pointer
+    width: 100%
+    box-sizing: border-box
+    border-radius: 0 0 5px 5px
+    border-color: rgba(0,0,0,.7)
+    border-top: 0
+    resize: vertical
+    min-height: 150px
+    padding: 1.5em
+    background-color: #ecf0f1
+    outline: none
+    resize: none
+    border: none
+  &:hover 
+    .control
+      display: block
+      right: -40px
+      transition: right .3s ease-in-out
+      -webkit-transition: right .3s ease-in-out
+    .horizontal-menu
+      width: 100%
+      right: -112px
+  .horizontal-menu
+    width: 100%
+    ul
+      float: right
+      li:not(#tick):not(#times)
+        display: inline-block
+      li#views 
+        color: inherit
+    #tick
+      display: none 
+    #times
+      display: none 
+  .control
+    -webkit-transition: right 1s ease-in-out
+    transition: right 1s ease-in-out
+    z-index: -1
+    height: 100%
+    position: absolute
+    top: 0
+    right: 0
+    background: black
+    opacity: 0.7
+    border-radius: 5px
+    color: #fff
+    ul
+      list-style: none
+      margin: 0 10px 0 15px 
+      padding: 0
+      li 
+        display: list-item
+        &:first-child
+          margin-top: 13px
+        a
+          font-size: 20px
+          text-decoration: none
+          color: inherit
+      #views 
+        color: grey
+      #tick
+        color: green
+        display: none
+      #times
+        color: red
+        display: none
+  .new-title 
+    margin: 0
+    display: block
+    width: 100%
+    font: inherit
+    outline: none 
+    resize: none 
+    text-align: center
+    font-size: 1em
+    background-color: silver
+    background-image: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.15))
+    border-radius: 5px 5px 0 0
+    box-shadow: inset 0 1px rgba(255,255,255,.3)
+    padding: .75em 0
+    color: #fff
+    text-shadow: 0 1px 1px rgba(0,0,0,.2)
+    margin: 0
+    position: relative
+    border: none
 
 .dragHover
-  border: 1px dashed silver
+  .title 
+    background: grey

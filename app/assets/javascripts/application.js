@@ -10,10 +10,10 @@
 // WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
 // GO AFTER THE REQUIRES BELOW.
 //
-//= require jquery
+//= require jquery-2.0.0
 //= require jquery_ujs
 //= require jquery.ui.all
-//= require excanvas.compiled
-//= require jquery.jsPlumb-1.3.16-all-min
+//= require jquery.jsPlumb-1.4.0-all
 //= require mustache
+//= require sugar-1.3.9.min
 //= require_tree .

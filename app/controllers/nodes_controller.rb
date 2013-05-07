@@ -9,8 +9,7 @@ class NodesController < ApplicationController
   end
   
   def create
-    id = Node.count > 0 ? Node.last.id + 1 : 0
-    @node = Node.new name: "node #{id}", description: "node #{id}"
+    @node = Node.new name: "node", description: "node"
     if request.xhr?   
       render json: @node if @node.save 
     end 
@@ -28,7 +27,11 @@ class NodesController < ApplicationController
       if params[:node]
         Node.find(params[:id]).update_attributes(params[:node])
       elsif params[:connection]
-        Node.find(params[:connection][:from]).nodes << Node.find(params[:connection][:to])
+        if params[:connection][:destroy] == 'true'
+          Node.find(params[:connection][:from]).nodes.delete Node.find(params[:connection][:to])
+        else 
+          Node.find(params[:connection][:from]).nodes << Node.find(params[:connection][:to])
+        end
       end 
     end 
     render nothing: true
