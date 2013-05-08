@@ -37,7 +37,6 @@ header.main-menu
 
 section#workspace
   padding-top: 30px
-
   .horizontal-menu-on
     .title
       border-radius: 5px
@@ -83,15 +82,19 @@ section#workspace
     resize: none
     border: none
   &:hover 
-    .control
+    .vertical-menu
       display: block
       right: -40px
       transition: right .3s ease-in-out
       -webkit-transition: right .3s ease-in-out
     .horizontal-menu
+      transition: right .3s ease-in-out
+      -webkit-transition: right .3s ease-in-out
       width: 100%
       right: -112px
   .horizontal-menu
+    -webkit-transition: right 1s ease-in-out
+    transition: right 1s ease-in-out
     width: 100%
     ul
       float: right
@@ -99,13 +102,15 @@ section#workspace
         display: inline-block
       li#views 
         color: inherit
-    #tick
-      display: none 
-    #times
-      display: none 
-  .control
+  .vertical-menu 
     -webkit-transition: right 1s ease-in-out
     transition: right 1s ease-in-out
+    ul 
+      li 
+        display: list-item
+      #views 
+        color: grey
+  .control
     z-index: -1
     height: 100%
     position: absolute
@@ -119,16 +124,13 @@ section#workspace
       list-style: none
       margin: 0 10px 0 15px 
       padding: 0
-      li 
-        display: list-item
+      li
         &:first-child
           margin-top: 13px
         a
           font-size: 20px
           text-decoration: none
           color: inherit
-      #views 
-        color: grey
       #tick
         color: green
         display: none

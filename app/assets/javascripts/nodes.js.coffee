@@ -1,14 +1,14 @@
 node_template = 
   """
-    <div id='node{{id}}' class='node' style='top:{{x}}px; left:{{y}}px'>
+    <div id='node{{id}}' class='node' style='top:{{x}}px; left:{{y}}px' data-hidden='{{hidden}}' data-id='{{id}}'>
       <h1 class='title'>{{name}}</h1>
-      <textarea class='description' style='display:{{horizontal}}'>{{description}}</textarea>
+      <textarea class='description'>{{description}}</textarea>
     </div>
   """
 
 control_menu_template = 
   """
-    <div class='control {{horizontal}}'>
+    <div class='control vertical-menu'>
       <ul>
         {{#options}}
           <li id='{{.}}' ><a class='typicons-{{.}} {{.}}' title='{{.}}' href="#"></a></li>
@@ -17,25 +17,26 @@ control_menu_template =
     </div>
   """
 
+stroke_style = "#ecf0f1"
+stroke_style_hover = "#3090bd"
+
 nodeConnector = 
   paintStyle: 
     lineWidth: 2
-    strokeStyle: "#ecf0f1"
-  #endpoint: "Blank",
+    strokeStyle: stroke_style
+  endpoint: "Blank",
   anchor: "Continuous"
   overlays: [ ["PlainArrow", {location:1, width:20, length:12} ]]
   #connector: ["StateMachine", curviness: 20 ]
 
 @nodes = 
   init: -> 
-    jsPlumb.importDefaults
-      Endpoint: ["Dot",
-        radius: 2
-      ]
+    jsPlumb.importDefaults 
+      Endpoint: "Blank"
       HoverPaintStyle:
-        strokeStyle: "#3090bd"
+        strokeStyle: stroke_style_hover
         lineWidth: 2
-      ConnectionOverlays: [["Arrow",
+      ConnectionOverlays: [[ "Arrow", 
         location: 1
         id: "arrow"
         length: 14
@@ -45,13 +46,21 @@ nodeConnector =
          #id: "label"]
       ]
 
-    nodes.growing_tree()
+    nodes.draw_maps()
     nodes.handle_main_menu()
-    #nodes.update_changes()
+    nodes.handle_connections_delete()
+    nodes.update_changes()
 
+  check_updates: (klass) ->
+    # need update description for all nodes
+    $("#{klass} .description").on 'input', -> 
+      id = $(this).parents('.node').data 'id'
+      window["node#{id}_changed"] = true
+
+  handle_connections_delete: -> 
     # delete connection 
     jsPlumb.bind "click", (connection) ->
-      if confirm 'are u sure ?'
+      if confirm 'Delete connection?'
         from = connection.sourceId.replace(/^\D+/,'')
         to = connection.targetId.replace(/^\D+/,'')
         $.ajax(type: 'PUT', url: "/nodes/#{from}", data: { connection: { from: from, to: to, destroy: true }}).done -> 
@@ -60,38 +69,43 @@ nodeConnector =
   update_changes: -> 
     interval = setInterval ( -> 
       $('.node').each -> 
-        if window[$(this).attr('id')]
-          id = $(this).attr('id').replace(/^\D+/,'')
+        id = $(this).data 'id'
+        if window["node#{id}_changed"]
           $.ajax(type: 'PUT', url: "/nodes/#{id}", data: { node: { description: $(this).find('textarea.description').val() }}).done -> 
-            window[$(this).attr('id')] = undefined
+            window["node#{id}_changed"] = undefined
     ), 10000
 
   handle_main_menu: -> 
     $('header.main-menu a.create').click -> nodes.create_block()
     $('header.main-menu a.zoom_in').click -> nodes.zoom_workspace(0.1)
     $('header.main-menu a.zoom_out').click -> nodes.zoom_workspace(-0.1)
+    $('header.main-menu a.hide_descriptions').click -> nodes.switch_menu()
+
+  switch_menu: ->
 
   create_block: -> 
     $.ajax(type: 'POST', url: "/nodes").done (data)-> 
       $('section#workspace').append $(Mustache.render(node_template, id: data.id, name: data.name, description: data.description, x: 30, y: 0)).addClass 'new-node'
-      nodes.rebind_blocks '.new-node'
       nodes.draw_control_menu(data.id)
+      nodes.rebind_blocks '.new-node'
 
-  draw_control_menu: (id, hidden) -> 
+  draw_control_menu: (id) -> 
     menu_elements = 
       options: ['views', 'edit', 'tick', 'times', 'delete']
-      horizontal: if hidden == true then 'horizontal-menu' else ''
     $("#node#{id}").append $(Mustache.render(control_menu_template, menu_elements))
+    if $("#node#{id}").data 'hidden'
+      $("#node#{id}").toggleClass 'horizontal-menu-on'
+      $("#node#{id}").find('.control').addClass('horizontal-menu').removeClass('vertical-menu')
+      $("#node#{id}").find('.description').css display: 'none'
 
-  # create all nodes 
-  growing_tree: -> 
+  draw_maps: -> 
     #$('section#workspace').html ''
     $.ajax(type: 'GET', url: "/", dataType: 'JSON').done (data)-> 
       # render nodes 
       $.each data, (k)-> 
         unless  $(".node[data-id='#{k}']").length > 0
-          $('section#workspace').append Mustache.render node_template, id: k, name: data[k]['name'], description: data[k]['description'], x: data[k]['x'], y: data[k]['y'], horizontal: if data[k]['hidden'] == true then 'none' else ''
-          nodes.draw_control_menu(k, data[k]['hidden'])
+          $('section#workspace').append Mustache.render node_template, id: k, name: data[k]['name'], description: data[k]['description'], x: data[k]['x'], y: data[k]['y'], hidden: data[k]['hidden']
+          nodes.draw_control_menu(k)
 
       # render connections 
       $.each data, (k,v)-> 
@@ -109,7 +123,7 @@ nodeConnector =
     window.current_zoom += i 
     if window.current_zoom > 0.4
       $('section#workspace').css(zoom: window.current_zoom) 
-    else 
+    else
       window.current_zoom = 0.4
     jsPlumb.repaintEverything()
 
@@ -117,7 +131,7 @@ nodeConnector =
     pointY = 0
     pointX = 0
 
-    # make nodes draggable 
+    # make nodes draggable and few fixes for zoom 
     jsPlumb.draggable $(klass), 
       handle: '.title'
       start: (e, ui)-> 
@@ -130,33 +144,35 @@ nodeConnector =
           jsPlumb.repaint $(e.target).attr 'id'
       stop: (e, ui)-> 
         jsPlumb.repaint $(e.target).attr 'id'
-        id = ui.helper.attr('id').replace(/^\D+/,'')
+        id = ui.helper.data('id')
         # save current position
         $.ajax type: 'PUT', url: "/nodes/#{id}", data: { node: { x: ui.position.top, y: ui.position.left }}
 
     # delete node
     $(klass).on 'click', '.control a.delete', ->
-      id = $(this).parents('.node').attr('id').replace(/^\D+/,'')
-      if id and confirm 'are you sure?'
-        jsPlumb.detachAllConnections "node#{id}"
-        $("#node#{id}").remove()
-        $.ajax type: 'DELETE', url: "nodes/#{id}"
+      id = $(this).parents('.node').data 'id'
+      if id and confirm 'Delete node?'
+        $.ajax(type: 'DELETE', url: "nodes/#{id}").done ->
+          jsPlumb.remove $("#node#{id}")
     false
 
     # show/hide titles
     $(klass).on 'click', '.control a.views', ->
-      id = $(this).parents('.node').attr('id').replace(/^\D+/,'')
+      id = $(this).parents('.node').data 'id'
       if id 
         $("#node#{id}").find('.description').animate
           height: 'toggle'
         , 100, -> 
           jsPlumb.repaint $("#node#{id}")
           control_menu = $("#node#{id}").find('.control')
-          control_menu.toggleClass 'horizontal-menu'
           $("#node#{id}").toggleClass 'horizontal-menu-on'
+          unless control_menu.hasClass 'horizontal-menu'
+            control_menu.addClass('horizontal-menu').removeClass('vertical-menu')
+          else 
+            control_menu.removeClass('horizontal-menu').addClass('vertical-menu')
           hidden = $("#node#{id}").find('.horizontal-menu').get(0)
           $("#node#{id}").find('.horizontal-menu #edit').css(display: 'inline-block') if hidden 
-          $.ajax(type: 'PUT', url: "nodes/#{id}", data: { node: { hidden: if hidden != undefined then true else false }})
+          $.ajax(type: 'PUT', url: "nodes/#{id}", data: { node: { hidden: if hidden then true else false }})
     false
 
     # edit title
@@ -175,6 +191,7 @@ nodeConnector =
         else 
           $("#node#{id} #tick, #node#{id} #times").css display: 'list-item'
         $("#node#{id} #edit").css display: 'none'
+
         $("#node#{id} #tick, #node#{id} #times").click -> 
           if horizontal_menu
             $("#node#{id} #edit").css display: 'inline-block'
@@ -193,9 +210,8 @@ nodeConnector =
       jsPlumb.makeSource $(e),
         parent: parent
         anchor: "Continuous"
-        #connector: ["StateMachine", curviness: 20]
         connectorStyle:
-          strokeStyle: "#ecf0f1"
+          strokeStyle: stroke_style
           lineWidth: 2
         maxConnections: -1
 
@@ -215,9 +231,7 @@ nodeConnector =
         else 
           false 
 
-    # need update description for next nodes
-    $('.node textarea').on 'input', -> 
-      window[$(this).parents('.node').attr('id')] = true
+    nodes.check_updates(klass)
 
 $ -> 
   window.nodes.init()
