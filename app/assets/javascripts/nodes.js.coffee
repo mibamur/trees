@@ -79,9 +79,6 @@ nodeConnector =
     $('header.main-menu a.create').click -> nodes.create_block()
     $('header.main-menu a.zoom_in').click -> nodes.zoom_workspace(0.1)
     $('header.main-menu a.zoom_out').click -> nodes.zoom_workspace(-0.1)
-    $('header.main-menu a.hide_descriptions').click -> nodes.switch_menu()
-
-  switch_menu: ->
 
   create_block: -> 
     $.ajax(type: 'POST', url: "/nodes").done (data)-> 
@@ -192,14 +189,18 @@ nodeConnector =
           $("#node#{id} #tick, #node#{id} #times").css display: 'list-item'
         $("#node#{id} #edit").css display: 'none'
 
+        $("#node#{id} .new-title").bind 'keypress', (e) -> 
+          $("#node#{id} #tick").click() if e.keyCode == 13
+
         $("#node#{id} #tick, #node#{id} #times").click -> 
+          new_title = $("#node#{id} .new-title").val()
           if horizontal_menu
             $("#node#{id} #edit").css display: 'inline-block'
           else
-            $("#node#{id} #edit").css display: 'list-item'
-          if $(this).attr('id') == 'tick'
-            $.ajax(type: 'PUT', url: "/nodes/#{id}", data: { node: { name: $("#node#{id} .new-title").val() }}).done -> 
-            title.text $("#node#{id} .new-title").val()
+            $("#node#{id} #edit").css display: 'list-item' 
+          if $(this).attr('id') == 'tick' and new_title? and old_title != new_title
+            $.ajax(type: 'PUT', url: "/nodes/#{id}", data: { node: { name: new_title }}).done -> 
+              title.text $("#node#{id} .new-title").val()
           title.show()
           $("#node#{id} .new-title").remove()
           $("#node#{id} #tick, #node#{id} #times").css display: 'none'
