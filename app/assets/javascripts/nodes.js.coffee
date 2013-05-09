@@ -180,30 +180,37 @@ nodeConnector =
         old_title = title.html()
         horizontal_menu = $("#node#{id}").find('.control').hasClass 'horizontal-menu'
         title.hide()
-        $("#node#{id} .new-title").remove()
         $("#node#{id}").prepend "<input type='text' class='new-title' value='#{old_title}'></input>"
-        $("#node#{id} .new-title").focus()
+        new_title = $("#node#{id}").find '.new-title'
+        new_title.focus()
+
         if horizontal_menu
           $("#node#{id} #tick, #node#{id} #times").css display: 'inline-block'
         else 
           $("#node#{id} #tick, #node#{id} #times").css display: 'list-item'
         $("#node#{id} #edit").css display: 'none'
 
-        $("#node#{id} .new-title").bind 'keypress', (e) -> 
-          $("#node#{id} #tick").click() if e.keyCode == 13
+        new_title.bind 'keypress', (e) -> 
+          $("#node#{id} a.tick").click() if e.keyCode == 13
 
-        $("#node#{id} #tick, #node#{id} #times").click -> 
-          new_title = $("#node#{id} .new-title").val()
-          if horizontal_menu
-            $("#node#{id} #edit").css display: 'inline-block'
-          else
-            $("#node#{id} #edit").css display: 'list-item' 
-          if $(this).attr('id') == 'tick' and new_title? and old_title != new_title
-            $.ajax(type: 'PUT', url: "/nodes/#{id}", data: { node: { name: new_title }}).done -> 
-              title.text $("#node#{id} .new-title").val()
-          title.show()
-          $("#node#{id} .new-title").remove()
-          $("#node#{id} #tick, #node#{id} #times").css display: 'none'
+    $(klass).on 'click', '.control a.tick, .control a.times', -> 
+      id = $(this).parents('.node').attr('id').replace(/^\D+/,'')
+      if id
+        horizontal_menu = $("#node#{id}").find('.control').hasClass 'horizontal-menu'
+        title = $("#node#{id} h1.title")
+        old_title = title.html()
+        new_title = $("#node#{id}").find '.new-title'
+
+        if horizontal_menu
+          $("#node#{id} #edit").css display: 'inline-block'
+        else
+          $("#node#{id} #edit").css display: 'list-item' 
+        if $(this).hasClass('tick') and old_title != new_title.val()
+          $.ajax type: 'PUT', url: "/nodes/#{id}", data: { node: { name: new_title.val() }}
+          title.text new_title.val()
+        title.show()
+        new_title.remove()
+        $("#node#{id} #tick, #node#{id} #times").css display: 'none'
 
     # make element as source of connection
     $("#{klass} .control").each (i, e) ->
